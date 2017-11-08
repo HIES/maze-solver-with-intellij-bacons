@@ -1,7 +1,7 @@
 public class Maze
 {
     private Cell[][] board;
-    private final int DELAY = 200;
+    private final int DELAY = 100;
 
     public Maze(int rows, int cols, int[][] map){
         StdDraw.setXscale(0, cols);
@@ -26,62 +26,53 @@ public class Maze
             StdDraw.show();
     }
 
-    public boolean findPath(int row, int col)
-    {
-        boolean isFinished = false;
-
-        //ensure that we can explore this cell
-        if (isValid(row, col))
-        {
-            //mark the cell as visisted
+    public boolean findPath(int row, int col) {
+        boolean fin = false;
+        if(isValid(row,col)){
             board[row][col].visitCell();
-            this.draw();
+            draw();
             StdDraw.pause(DELAY);
-
-            //are we at the end of the maze?
-            if (isExit(row, col))
-                isFinished = true;
-
-            //we are not the end, so let's explore the 4 adjacent cells
-            else{
-                //try the cell below
-                isFinished = findPath(row + 1, col);
-
-                //if not finished yet, try to the right
-                if (!isFinished)
-                    isFinished = findPath(row, col + 1);
-                //if not finished yet, try above
-                if (!isFinished)
-                    isFinished = findPath((row - 1), col);
-                //if not finished yet, try to the left
-                if (!isFinished)
-                    isFinished = findPath((row), col - 1);
+            if(isExit(row,col)){
+                fin = true;
             }
-
-            //if we have reached the end, this current cell is part of the final path
-            if (isFinished)
+            else{
+                fin = findPath(row,(col+1));
+                if(!fin)
+                    fin = findPath((row+1),col);
+                if(!fin)
+                    fin = findPath(row,(col-1));
+                if(!fin)
+                   fin = findPath((row-1),col);
+            }
+            if(fin)
                 board[row][col].becomePath();
-            this.draw();
-            StdDraw.pause(DELAY);
 
-            return isFinished;
+                draw();
+                StdDraw.pause(DELAY);
+            return fin;
         }
-        return isFinished;
+        return fin;
     }
 
-    private boolean isValid(int row, int col)
-    {
-        //ensure that (row, col) is a valid location in grid
-        if (row >= 0 && row < board.length && col >= 0 && col < board[row].length)
-            //ensure that the cell is open and hasn't been visited yet
-            return(!board[row][col].isWall() && !board[row][col].isVisited());
+
+
+    private boolean isValid(int row, int col) {
+        if (row>= 0 && row<board.length && col>=0 && col<board[0].length){
+            if(!board[row][col].isWall() && !board[row][col].isVisited()){
+                return true;
+            }
+        }
         return false;
     }
 
     private boolean isExit(int row, int col)
     {
-        return row == board.length - 1 && col == board[row].length - 1;
+        if(row==board.length-1 && col == board[0].length-1){
+            return true;
+        }
+        else return false;
     }
+
 
     public static void main(String[] args) {
         StdDraw.enableDoubleBuffering();
